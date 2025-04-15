@@ -737,6 +737,7 @@ class Tool(BaseModel):
 
     model_config = ConfigDict(extra="allow")
 
+
 class ListToolsResult(PaginatedResult):
     """The server's response to a tools/list request from the client."""
 

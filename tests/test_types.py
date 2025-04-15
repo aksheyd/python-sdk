@@ -5,6 +5,8 @@ from mcp.types import (
     ClientRequest,
     JSONRPCMessage,
     JSONRPCRequest,
+    Tool,
+    ToolAnnotations,
 )
 
 
@@ -30,3 +32,31 @@ async def test_jsonrpc_request():
     assert request.root.method == "initialize"
     assert request.root.params is not None
     assert request.root.params["protocolVersion"] == LATEST_PROTOCOL_VERSION
+
+
+def test_tool_annotations():
+    annotations = ToolAnnotations(
+        title="Echo Tool",
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    )
+    echo_tool = Tool(
+        name="echo",
+        inputSchema={"type": "object"},
+        annotations=annotations,
+    )
+    assert echo_tool.annotations.title == "Echo Tool"
+    assert echo_tool.annotations.readOnlyHint is True
+    assert echo_tool.annotations.destructiveHint is False
+    assert echo_tool.annotations.idempotentHint is True
+    assert echo_tool.annotations.openWorldHint is False
+
+    data = echo_tool.model_dump()
+    assert "annotations" in data
+    assert data["annotations"]["title"] == "Echo Tool"
+    assert data["annotations"]["readOnlyHint"]
+    assert not data["annotations"]["destructiveHint"]
+    assert data["annotations"]["idempotentHint"]
+    assert not data["annotations"]["openWorldHint"]
