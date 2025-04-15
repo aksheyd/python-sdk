@@ -705,6 +705,24 @@ class ListToolsRequest(PaginatedRequest[RequestParams | None, Literal["tools/lis
     params: RequestParams | None = None
 
 
+class ToolAnnotations(BaseModel):
+    title: str | None
+    """A human-readable title for the tool."""
+    readOnlyHint: bool = False
+    """If true, the tool does not modify its environment."""
+    destructiveHint: bool = True
+    """If true, the tool may perform destructive updates to its environment.
+       If false, the tool performs only additive updates."""
+    idempotentHint: bool = False
+    """If true, calling the tool repeatedly with the same arguments 
+       will have no additional effect on the its environment."""
+    openWorldHint: bool = True
+    """If true, this tool may interact with an "open world" of external
+       entities. If false, the tool's domain of interaction is closed.
+       For example, the world of a web search tool is open, whereas that
+       of a memory tool is not."""
+
+
 class Tool(BaseModel):
     """Definition for a tool the client can call."""
 
@@ -714,8 +732,10 @@ class Tool(BaseModel):
     """A human-readable description of the tool."""
     inputSchema: dict[str, Any]
     """A JSON Schema object defining the expected parameters for the tool."""
-    model_config = ConfigDict(extra="allow")
+    annotations: ToolAnnotations | None = None
+    """Optional properties describing tool behaviour"""
 
+    model_config = ConfigDict(extra="allow")
 
 class ListToolsResult(PaginatedResult):
     """The server's response to a tools/list request from the client."""
